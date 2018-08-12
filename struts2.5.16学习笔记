@@ -1,0 +1,90 @@
+#########################################################
+
+#在struts官方网站https://struts.apache.org/下载struts-2.5.16-min-lib.zip包，这个包是一个struts项目最核心的包，缺一不可。
+
+
+1.第一个简单的struts2项目需要的jar包
+    commons-fileupload-1.3.3.jar
+    commons-io-2.5.jar
+    commons-lang3-3.6.jar
+    freemarker-2.3.26-incubating.jar
+    javassist-3.20.0-GA.jar
+    log4j-api-2.10.0.jar
+    ognl-3.1.15.jar
+    struts2-core-2.5.16.jar
+#把上面的包复制到项目的WebConent/WEB-INF/lib目录下
+
+2.在src目录下新建struts.xml.并且编辑
+  <?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+	"http://struts.apache.org/dtds/struts-2.5.dtd">
+<!-- START SNIPPET: xworkSample -->
+<struts>
+	<package name="ziyu" namespace="/test" extends="struts-default">
+		<action name="hello" class="com.ziyu.struts.hello" method="sdgiosafoinwe">
+			<result name="success">/WEB-INF/page/hello.jsp</result>
+		</action>
+	</package>
+</struts>
+<!-- END SNIPPET: xworkSample -->
+
+3.编辑web.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_9" version="2.4"
+	xmlns="http://java.sun.com/xml/ns/j2ee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+   <filter>
+        <filter-name>struts-prepare</filter-name>
+        <filter-class>org.apache.struts2.dispatcher.filter.StrutsPrepareFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>struts-execute</filter-name>
+        <filter-class>org.apache.struts2.dispatcher.filter.StrutsExecuteFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>struts-prepare</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>struts-execute</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+</web-app>
+
+4.新建包：com.ziyu.struts，在包下新建类:hello.java,编辑
+package com.ziyu.struts;
+public class hello {
+	private String msg;
+	public String getMsg() {
+		return msg;
+	}
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}	
+	public String sdgiosafoinwe(){		
+		this.msg = "this is my frist struts project!!!";		
+		return "success";
+	}	
+}
+
+5.在WEB-INF目录下新建文件夹：page，新建hello.jsp，编辑
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>struts2 demo</title>
+</head>
+<body>
+		<h1>${msg }</h1>
+</body>
+</html>
+
+发布运行。
+
+一个简单struts2项目完成。
+
+
