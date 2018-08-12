@@ -85,6 +85,8 @@ public class hello {
 
 发布运行。
 
+访问路径：localhost：8080/项目名称/test/hello
+
 一个简单struts2项目完成。
 
 
