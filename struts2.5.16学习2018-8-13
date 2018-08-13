@@ -1,0 +1,126 @@
+
+1.出现了一个错误很久才搞明白
+  症状：eclipse编译后无法产生class文件，struts.xml文件停留在之前的状态，更改后，编译无法更新。一个action类的execute方法出现unused！ 
+  结论：我在execute（）方法前面加的限定符是private，后改为public正常，这个是失误，但是拍错浪费时间
+  
+2.今天编写了case：多文件上传+附带参数
+下面是代码：
+struts.xml--
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+	"http://struts.apache.org/dtds/struts-2.5.dtd">
+<!-- START SNIPPET: xworkSample -->
+<struts>
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.multipart.maxSize" value="10485760" />
+	<package name="ziyu" namespace="/test" extends="struts-default">	
+		<action name="aaa">
+			<result>/WEB-INF/page/uploadFile.jsp</result>
+		</action>	
+		<action name="hello" class="com.ziyu.struts.hello" method="sdgiosafoinwe">
+			<result name="success">/WEB-INF/page/hello.jsp</result>
+    </action>		
+		<action name="upfile" class="com.ziyu.struts.FileUpload">
+			<result name="success">/WEB-INF/page/message.jsp</result>
+		</action>			
+	</package>
+</struts>
+##<constant name="struts.devMode" value="true" />  ==》这句代表开发模式，无需重启服务器，就可以编译更新代码，直接测试
+##<constant name="struts.multipart.maxSize" value="10485760" />  ==》这句是文件上传的最大限制，系统默认大小是2M
+
+
+#FileUpload.java
+
+package com.ziyu.struts;
+import java.io.File;
+import org.apache.commons.io.FileUtils;
+import org.apache.struts2.ServletActionContext;
+import com.opensymphony.xwork2.ActionContext;
+public class FileUpload {
+	private File[] image;
+	private String[] imageFileName;
+	private String username;
+	private String password;	
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public File[] getImage() {
+		return image;
+	}
+	public void setImage(File[] image) {
+		this.image = image;
+	}
+	public String[] getImageFileName() {
+		return imageFileName;
+	}
+	public void setImageFileName(String[] imageFileName) {
+		this.imageFileName = imageFileName;
+	}	
+	public String execute() throws Exception {
+		String realpath = ServletActionContext.getServletContext().getRealPath("/image");
+		System.out.println(realpath);
+		if(image!=null){
+			File savedir = new File(realpath);
+			if(!savedir.exists())savedir.mkdirs();
+			for (int i = 0; i < image.length; i++) {
+				File savefile = new File(realpath,imageFileName[i]);
+				FileUtils.copyFile(image[i], savefile);
+				ActionContext.getContext().put("msg", "多文件上传成功！");
+			}
+		}
+		return "success";
+	}
+}
+
+#uploadFile.jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>File Upload</title>
+</head>
+<body>
+
+	<form action="upfile" method="post" enctype="multipart/form-data">
+		用户名：<input type="text" name="username"/><br/>
+		密&emsp;码：<input type="password" name="password"><br/>
+		<input type="file" name="image" multiple /><br/>
+		<input type="submit" value="submit"/>
+	</form>
+
+</body>
+</html>
+
+#message.jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Msg</title>
+</head>
+<body>
+	<h1 style="color: red">${msg }</h1>
+	<h1 style="color: blue">${username }</h1>
+	<h1 style="color: blue">${password }</h1>
+</body>
+</html>
+
+
+#message页面打印出来了uploadFile.jsp页面中输入的username和password的，并且把文件也上传成功，所以此次学习目的达到
+
+使用struts2.5的文件上传功能真是方便啊！！！！
+
