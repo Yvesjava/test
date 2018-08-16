@@ -1,0 +1,94 @@
+症状：tomcat启动一闪而过，说明tomcat并未启动成功
+
+原因：我在tomcat启动之前就删掉了webapps文件中的一个项目，造成tomcat未能找到里面的项目
+
+https://blog.csdn.net/baidu_32739019/article/details/64155136   在此处找到的问题排除方法
+
+原文贴上：
+启动tomcat时cmd窗口一闪而过解决方法。
+
+问题现象：
+
+在实际开发中一般都是eclipse+tomcat(也许还会用到tomcat的插件)，我们只需要在eclipse中单击servers上的按钮就可以成功启动tomcat了，
+
+但是如果想在tomcat的安装目录下 双击startup.bat启动时却一闪而过了。这是为什么呢（tomcat启动失败），马上就带大家看看具体的原因。
+
+下面我先跟大家确认一下问题出现的前提条件（本机版本java：1.6.20，tomcat：6.0.32）：
+
+1）在eclipse里面启动tomcat时都是正常的。
+
+2）在系统中配置了各种环境变量如下：
+
+JAVA_HOME：H:\DevelopTools\Java\jdk1.6.0_20
+
+CATALINA_BASE：H:\DevelopTools\apache-tomcat-6.0.32
+
+CATALINA_HOME：H:\DevelopTools\apache-tomcat-6.0.32
+
+CLASSPATH：.;%JAVA_HOME%;%JAVA_HOME%\jre\lib;
+
+PATH：.;%JAVA_HOME%\bin;%CATALINA_HOME%\bin;
+
+ 
+
+来分析一下：
+
+进入tomcat的安装目录(即解压后放置的地方)：
+
+看到圈出红色的3个bat文件，一般通过startup.bat启动tomcat时流程是：startup->catalina->setclasspath->catalina
+
+如果这3个bat文件里面有一个出现错误的话就是启动失败。为了找到一闪而过的原因得需要我们来看看这3个文件里面到底是什么了
+
+
+
+ 
+
+先记事本打开startup.bat，找到最后一句话：:end，我们知道end表示结束的意思，:end是一个标记，我们在后面加上一句pause
+
+
+
+
+
+ 
+
+(暂停等待的意思)再次执行startup.bat，就会看到上图，当我们按任意的键时cmd窗口又是一闪而过了。但是这已经确定了我们的环境变量都是正确的。
+
+ 
+
+ 
+
+为了更加详细的看到信息，我们再来更改一句：找到call "%EXECUTABLE%" start %CMD_LINE_ARGS% 把里面的start替换为run。
+
+
+
+
+
+ 
+
+再来看看cmd窗口里面输出错误信息了：
+
+error occurred during initialization of vm
+
+could not reserve enough space for objectheap
+
+could not create the java virtual machine
+
+我们大体可以理解为：因为程序请求不到足够的内存就启动不了vm，导致程序退出。
+
+那么我们可以来解决这个问题了：申请足够的内存就可以了
+
+如下操作：在catalina.bat中 找到Execute The Requested Command下面的
+
+set JAVA_OPTS把这一句替换为：
+
+ 
+
+set JAVA_OPTS=%JAVA_OPTS% -server -Xms800m-Xmx800m -XX:MaxNewSize=256m
+
+再次启动startup.bat会看到
+
+ 
+
+已经启动成功了(记得把之前修改的内容run、pause还原回去)。
+
+到这里,貌似问题已经解决了，如果遇到其他的问题该怎么解决呢(因为其他的问题也会导致cmd窗口一闪而过)？
